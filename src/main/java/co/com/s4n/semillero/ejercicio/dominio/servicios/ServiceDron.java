@@ -2,53 +2,50 @@ package co.com.s4n.semillero.ejercicio.dominio.servicios;
 
 import co.com.s4n.semillero.ejercicio.dominio.entidades.Dron;
 import co.com.s4n.semillero.ejercicio.dominio.entidades.Ruta;
-import co.com.s4n.semillero.ejercicio.dominio.vo.Direccion;
+import co.com.s4n.semillero.ejercicio.dominio.vo.Orientacion;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.concurrent.Future;
+import io.vavr.control.Try;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ServiceDron {
 
+    private final static int limInf = -10;
+    private final static int limSup = 10;
+
     public static Future<Dron> avanzar(Dron dron){
         int nX = dron.getX();
         int nY = dron.getY();
-        Direccion d = dron.getD();
+        Orientacion d = dron.getD();
         switch (d){
-            case norte:{
-                nY+=1;
-                break;
+            case norte:{ nY+=1; break;
             }
-            case sur: {
-                nY-=1;
-                break;
+            case sur: { nY-=1; break;
             }
-            case este: {
-                nX+=1;
-                break;
+            case este: { nX+=1; break;
             }
-            case oeste: {
-                nX-=1;
-                break;
+            case oeste: { nX-=1; break;
             }
         }
 
         Dron nDron = new Dron(nX,nY,d);
-        return Future.of(()->nDron);
+        return enLimite(nX,nY) ? Future.of(()->nDron) : Future.of(() -> {throw new Error("Dron sale del límite");});
     }
 
     public static Future<Dron> rotarIzq(Dron dron){
-        Direccion d = dron.getD();
-        if(d.equals(Direccion.norte)){
-            d = Direccion.oeste;
-        }else if (d.equals(Direccion.sur)){
-            d = Direccion.este;
-        }else if (d.equals(Direccion.este)){
-            d = Direccion.norte;
-        }else if (d.equals(Direccion.oeste)){
-            d = Direccion.sur;
+        Orientacion d = dron.getD();
+        if(d.equals(Orientacion.norte)){
+            d = Orientacion.oeste;
+        }else if (d.equals(Orientacion.sur)){
+            d = Orientacion.este;
+        }else if (d.equals(Orientacion.este)){
+            d = Orientacion.norte;
+        }else if (d.equals(Orientacion.oeste)){
+            d = Orientacion.sur;
         }
 
         Dron nDron = new Dron(dron.getX(),dron.getY(),d);
@@ -56,15 +53,15 @@ public class ServiceDron {
     }
 
     public static Future<Dron> rotarDer(Dron dron){
-        Direccion d = dron.getD();
-        if(d.equals(Direccion.norte)){
-            d = Direccion.este;
-        }else if (d.equals(Direccion.sur)){
-            d = Direccion.oeste;
-        }else if (d.equals(Direccion.este)){
-            d = Direccion.sur;
-        }else if (d.equals(Direccion.oeste)){
-            d = Direccion.norte;
+        Orientacion d = dron.getD();
+        if(d.equals(Orientacion.norte)){
+            d = Orientacion.este;
+        }else if (d.equals(Orientacion.sur)){
+            d = Orientacion.oeste;
+        }else if (d.equals(Orientacion.este)){
+            d = Orientacion.sur;
+        }else if (d.equals(Orientacion.oeste)){
+            d = Orientacion.norte;
         }
 
         Dron nDron = new Dron(dron.getX(),dron.getY(),d);
@@ -89,35 +86,45 @@ public class ServiceDron {
             drones.add(elegirAccion(s,drones.get(index[0])));
             index[0]++;
         });
-        System.out.println(drones.get(index[0]).get().toString());
         return drones.get(index[0]);
     }
 
-    public static Future<Dron> cargarRuta(Dron dron, io.vavr.collection.List<Ruta> rutas){
-
-        String a = String.valueOf(dron.getX());
-        //rutas a string
-        rutas.fold(dron.toString(), (x,y)-> transform(x,y));
-
-
-
-
+    public static boolean enLimite(int x, int y){
+        return x <= limSup && x >= limInf && y <= limSup && y >= limInf;
     }
 
-    public static String transform(String dron, String ruta){
-
-        String[] array = dron.split(",");
-        int xpos = Integer.parseInt(array[0]);
-        int ypos = Integer.parseInt(array[1]);
-        switch (array[2]){
-            case "norte": ;
-            case "sur":;
-            case "este":;
-            case "oeste":;
-
+    public static String aString(Dron dron){
+        String x = String.valueOf(dron.getX());
+        String y = String.valueOf(dron.getY());
+        String o = "";
+        switch (dron.getD()){
+            case norte: o = "norte"; break;
+            case sur: o = "sur";break;
+            case este: o = "este";break;
+            case oeste: o = "oeste";break;
         }
-        Dron dron1 = new Dron(array[0],array[1],array3[])
+        String stringDron = x + "," + y + "," + o;
+        return stringDron;
     }
+
+
+    public static Future<Dron> cargarRuta(Ruta ruta){
+
+        String neo = "instruccion";
+        Dron drontest = new Dron();
+        io.vavr.collection.List<Tuple2<Future<Dron>, String>> tuplas = ruta.getRutas().map(r -> Tuple.of(Future.of(Dron::new), r));
+
+        Tuple2<Future<Dron>, String> fold = tuplas.fold(Tuple.of(Future.of(() -> new Dron()), neo), (tupacc, tupelem) -> {
+            String ins = tupelem._2;
+            Future<Dron> newDron = tupacc._1.flatMap(droncc -> ServiceDron.mover(ins, droncc));
+            return Tuple.of(newDron, neo);
+        });
+        return fold._1;
+
+
+    }
+
+
 
 
 }

@@ -1,12 +1,12 @@
 package co.com.s4n.semillero.ejercicio.dominio.entidades;
 
-import co.com.s4n.semillero.ejercicio.dominio.vo.Direccion;
+import co.com.s4n.semillero.ejercicio.dominio.vo.Orientacion;
 
 public class Dron {
 
     private int x = 0;
     private int y = 0;
-    private Direccion d = Direccion.norte;
+    private Orientacion d = Orientacion.norte;
 
     public int getX() {
         return x;
@@ -16,17 +16,17 @@ public class Dron {
         return y;
     }
 
-    public Direccion getD() {
+    public Orientacion getD() {
         return d;
     }
 
     public Dron() {
         this.x = 0;
         this.y = 0;
-        this.d = Direccion.norte;
+        this.d = Orientacion.norte;
     }
 
-    public Dron(int x, int y, Direccion d) {
+    public Dron(int x, int y, Orientacion d) {
         this.x = x;
         this.y = y;
         this.d = d;

@@ -5,4 +5,6 @@ compile
 exit
 testOnly co.com.s4n.semillero.ejercicio.TestMockito
 testOnly co.com.s4n.semillero.ejercicio.ServiceDronTest
+testOnly co.com.s4n.semillero.ejercicio.Testtests
+testOnly co.com.s4n.semillero.ejercicio.ServiceDronTest
 exit

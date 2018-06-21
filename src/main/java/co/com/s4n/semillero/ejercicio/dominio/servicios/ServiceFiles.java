@@ -1,6 +1,8 @@
 package co.com.s4n.semillero.ejercicio.dominio.servicios;
 
+import co.com.s4n.semillero.ejercicio.dominio.entidades.Dron;
 import co.com.s4n.semillero.ejercicio.dominio.entidades.Ruta;
+import io.vavr.Tuple;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
@@ -33,47 +35,48 @@ public class ServiceFiles {
 
     public static io.vavr.collection.List<io.vavr.collection.List<String>> listaAPedidos(List<String> list){
 
-
         io.vavr.collection.List<String> pedidos = io.vavr.collection.List.of();
         io.vavr.collection.List<io.vavr.collection.List<String>> newList = io.vavr.collection.List.of();
         int k = 1;
         int limLunches = 3;
         int j=0;
-        while (j<list.size() || j<=10){
-            pedidos.append(list.get(j));
+        while (j<list.size() && j<=10){
+            pedidos = pedidos.append(list.get(j));
             if(k%limLunches==0){
-                newList.append(pedidos);
+                newList = newList.append(pedidos);
                 pedidos = io.vavr.collection.List.empty();
             }
             k++;
             j++;
         }
         if (pedidos.size()!=0){
-            newList.append(pedidos);
+            newList =  newList.append(pedidos);
         }
-
-        /*for (String s:list){
-            pedidos.append(s);
-            if(k%limLunches==0){
-                newList.append(pedidos);
-                pedidos = io.vavr.collection.List.empty();
-            }
-            k++;
-        }
-        if (pedidos.size()!=0){
-            newList.append(pedidos);
-        }*/
         return newList;
+    }
+
+    public static io.vavr.collection.List<Ruta> listARuta(io.vavr.collection.List<io.vavr.collection.List<String>> list){
+
+
+        io.vavr.collection.List<Ruta> rutas = list.map(l -> new Ruta(l))
+                .map(l2 -> ServiceRuta.validarRuta(l2));
+        return rutas;
+        //io.vavr.collection.List<String> vavrList = list.get(index);
+        //Ruta rutas = new Ruta(vavrList);
+        //Ruta rutaValidada = ServiceRuta.validarRuta(rutas);
+
 
     }
 
-    public static io.vavr.collection.List<String> obtenerRuta(List<List<String>> list, int index){
+    /*String neo = "instruccion";
+    io.vavr.collection.List<Tuple2<Future<Dron>, String>> tuplas = ruta.getRutas().map(r -> Tuple.of(Future.of(Dron::new), r));
 
-        Stream<String> stream = list.get(index).stream();
-        io.vavr.collection.List<String> vavrList = stream.collect(io.vavr.collection.List.collector());
-        Ruta rutas = new Ruta(vavrList);
-        return vavrList;
+    Tuple2<Future<Dron>, String> fold = tuplas.fold(Tuple.of(Future.of(() -> dron), neo), (tupacc, tupelem) -> {
+        String ins = tupelem._2;
+        Future<Dron> newDron = tupacc._1.flatMap(droncc -> ServiceDron.mover(ins, droncc));
+        return Tuple.of(newDron, neo);
+    });
+        return fold._1;*/
 
-    }
 
 }
