@@ -77,7 +77,6 @@ public class ServiceDronTest {
     @Test
     public void testPedidos(){
         String ruta = "./src/test/resources/in.txt";
-        Stream<String> streamTeat = Stream.of("AAAAIAAD","DDAIAD", "AAIADAD");
         Try<Stream<String>> streams = ServiceFiles.leerArchivo(ruta);
         Option<java.util.List<String>> listaCreada = ServiceFiles.craerLista(streams);
 

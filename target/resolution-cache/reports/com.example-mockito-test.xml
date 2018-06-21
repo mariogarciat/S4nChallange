@@ -7,7 +7,7 @@
 		revision="0.1.0-SNAPSHOT"
 		conf="test"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, pom, scala-tool"
-		date="20180620082153"/>
+		date="20180621183310"/>
 	<dependencies>
 		<module organisation="org.powermock" name="powermock-api-mockito2">
 			<revision name="1.7.3" status="release" pubdate="20170916131549" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.powermock.org" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="24">
