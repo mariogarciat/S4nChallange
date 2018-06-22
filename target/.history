@@ -10,3 +10,5 @@ testOnly co.com.s4n.semillero.ejercicio.ServiceDronTest
 exit
 testOnly co.com.s4n.semillero.ejercicio.ServiceDronTest
 exit
+testOnly co.com.s4n.semillero.ejercicio.ServiceDronTest
+exit

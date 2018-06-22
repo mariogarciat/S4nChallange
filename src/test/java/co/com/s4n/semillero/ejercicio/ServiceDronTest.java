@@ -75,7 +75,7 @@ public class ServiceDronTest {
     }*/
 
     @Test
-    public void testPedidos(){
+    public void testCompleto(){
         String ruta = "./src/test/resources/in.txt";
         Try<Stream<String>> streams = ServiceFiles.leerArchivo(ruta);
         Option<java.util.List<String>> listaCreada = ServiceFiles.craerLista(streams);
@@ -98,23 +98,75 @@ public class ServiceDronTest {
         assertEquals(dronTest.getD(), fdron.getD());
     }
 
+
+    /**
+     * La validación de instrucciones (líneas del texto) se hace de manera que si no es válida se elimina de la ruta y
+     * se le envía al dron una nueva ruta de uno o dos almuerzos; por tanto se reinicia el dron cada que termina la ruta;
+     * no cada tres entregas.
+     */
+    @Test
+    public void testCompletoRutaIncorrecta(){
+        String ruta = "./src/test/resources/inIncorrecto.txt";
+        Try<Stream<String>> streams = ServiceFiles.leerArchivo(ruta);
+        Option<java.util.List<String>> listaCreada = ServiceFiles.craerLista(streams);
+
+        //System.out.println(list);
+        io.vavr.collection.List<io.vavr.collection.List<String>> listaF = ServiceFiles.listaAPedidos(listaCreada.get());
+
+        System.out.println(listaF);
+
+        List<Ruta> rutas = ServiceFiles.listARuta(listaF);
+        Dron dron = new Dron();
+        List<Dron> drons = rutas.flatMap(r -> ServiceDron.cargarRuta(r));
+        Dron fdron = drons.reverse().head();
+        Dron dronTest = new Dron(0,0,Orientacion.oeste);
+
+        System.out.println("final: "+fdron.toString());
+        System.out.println("test: "+dronTest.toString());
+        assertEquals(dronTest.getY(), fdron.getY());
+        assertEquals(dronTest.getX(), fdron.getX());
+        assertEquals(dronTest.getD(), fdron.getD());
+    }
+
     @Test
     public void testCargarRuta(){
 
         Dron dronTest = new Dron(0,0,Orientacion.oeste);
 
-        Dron dron = new Dron();
         List<String> of = List.of("AAAAIAAD", "DDAIAD", "AAIADAD");
         Ruta ruta1 = new Ruta(of);
 
-        /*Future<Dron> fdron = ServiceDron.cargarRuta(dron, ruta1);
+        Future<Dron> fdron = ServiceDron.cargarRuta(ruta1);
 
         System.out.println(fdron.get().toString());
         assertEquals(0,fdron.get().getX());
 
         assertEquals(dronTest.getY(), fdron.get().getY());
         assertEquals(dronTest.getX(), fdron.get().getX());
-        assertEquals(dronTest.getD(), fdron.get().getD());*/
+        assertEquals(dronTest.getD(), fdron.get().getD());
+    }
+
+    @Test
+    public void testFalloDeLimite(){
+
+        Dron dronTest = new Dron(0,0,Orientacion.oeste);
+
+        List<String> of = List.of("AAAAIAAD", "DDAAAAAAAAAAAAAAIAD", "AAIADAD");
+        Ruta ruta1 = new Ruta(of);
+
+        Future<Dron> fdron = ServiceDron.cargarRuta(ruta1);
+
+        if(!fdron.isSuccess()){
+            System.out.println("Dron sale del límite");
+            return;
+        }
+
+        System.out.println(fdron.get().toString());
+        assertEquals(0,fdron.get().getX());
+
+        assertEquals(dronTest.getY(), fdron.get().getY());
+        assertEquals(dronTest.getX(), fdron.get().getX());
+        assertEquals(dronTest.getD(), fdron.get().getD());
     }
 
 
